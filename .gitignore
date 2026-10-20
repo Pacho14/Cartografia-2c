@@ -1,0 +1,28 @@
+# Python virtual environment
+venv/
+env/
+.venv/
+
+# PyTorch / YOLO weights & caches
+*.pt
+*.onnx
+models_cache/
+
+# SQLite databases & WAL
+*.db
+*.db-shm
+*.db-wal
+server/storage/*.db*
+server/storage/videos/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Binaries & Tunnels
+*.exe
+cloudflared.exe
+
+# OS generated files
+Thumbs.db
+.DS_Store

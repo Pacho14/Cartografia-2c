@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="description" content="Cartografía de Recorridos y Mapa de Calor Espacial">
+    <title>Ritmos — Cartografía de Recorridos</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- HEADER                                                  -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <header id="app-header">
+        <div class="header-left">
+            <div class="logo">
+                <span class="logo-icon">◉</span>
+                <h1>Ritmos</h1>
+            </div>
+            <span class="version-badge">Cartografía de Recorridos</span>
+        </div>
+
+        <div class="header-center">
+            <input type="text" id="space-name-input" class="space-name-input" 
+                   placeholder="Espacio de observación" 
+                   value="Jardín Gandhi">
+        </div>
+
+        <div class="header-right">
+            <button id="btn-open-history" class="btn-history" title="Ver grabaciones anteriores">
+                <span>📂 Historial de Grabaciones</span>
+                <span id="history-count" class="history-badge">0</span>
+            </button>
+            <div id="connection-status" class="status-indicator disconnected">
+                <span class="status-dot"></span>
+                <span class="status-text">Desconectado</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- MAIN EXPERIENCE LAYOUT                                  -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <main id="app-main" style="grid-template-columns: 1fr;">
+        <!-- ─── Video & Canvas Area ─────────────────────────── -->
+        <section id="video-section" style="width: 100%;">
+            <div id="camera-container">
+                <video id="camera-video" autoplay playsinline muted></video>
+                <video id="replay-video" class="replay-video hidden" playsinline muted></video>
+                <canvas id="heatmap-canvas"></canvas>
+                <canvas id="overlay-canvas"></canvas>
+
+                <!-- Overlay: No camera placeholder -->
+                <div id="camera-placeholder" class="camera-overlay">
+                    <div class="placeholder-content">
+                        <span class="placeholder-icon">📷</span>
+                        <p>Presiona <strong>Iniciar Cámara</strong> para comenzar el registro de recorridos</p>
+                    </div>
+                </div>
+
+                <!-- Overlay: Processing indicator -->
+                <div id="processing-indicator" class="hidden">
+                    <span class="pulse-dot"></span>
+                    <span>Procesando visión</span>
+                </div>
+
+                <!-- Floating Mode Indicator: Historical Replay -->
+                <div id="replay-mode-badge" class="replay-mode-badge hidden">
+                    <span class="pulse-dot" style="background:#ff9f0a;"></span>
+                    <span style="font-weight:600;">VIDEO CAPTURADO + MAPA DE CALOR</span>
+                    <button id="btn-exit-replay-floating" class="btn-exit-replay-pill" title="Volver a la cámara en vivo">
+                        📹 Volver a Cámara en Vivo
+                    </button>
+                </div>
+
+                <!-- Floating Interactive Timeline Player (Video + Heatmap Replay) -->
+                <div id="timeline-player-bar" class="timeline-player-bar hidden">
+                    <div class="timeline-top-row">
+                        <div class="timeline-session-badge">
+                            <span class="timeline-pulse-dot"></span>
+                            <span class="timeline-session-title" id="timeline-session-name">Video Grabado</span>
+                            <span class="timeline-session-info" id="timeline-points-stat">0 puntos</span>
+                        </div>
+                        <div class="timeline-time-display">
+                            <span id="timeline-current-time">00:00</span>
+                            <span class="timeline-time-sep">/</span>
+                            <span id="timeline-total-duration">00:00</span>
+                        </div>
+                        <div class="timeline-right-actions">
+                            <div class="timeline-speed-selector">
+                                <button type="button" class="btn-timeline-speed" data-speed="0.5">0.5x</button>
+                                <button type="button" class="btn-timeline-speed active" data-speed="1.0">1x</button>
+                                <button type="button" class="btn-timeline-speed" data-speed="2.0">2x</button>
+                                <button type="button" class="btn-timeline-speed" data-speed="4.0">4x</button>
+                            </div>
+                            <button id="btn-timeline-close" class="btn-timeline-close btn-return-live-accent" title="Volver a la cámara">🔴 Volver a Cámara</button>
+                        </div>
+                    </div>
+
+                    <!-- Scrubber Track Slider -->
+                    <div class="timeline-scrubber-container">
+                        <input type="range" id="timeline-scrubber" min="0" max="100" step="0.1" value="0" class="timeline-slider">
+                    </div>
+
+                    <!-- Playback Controls -->
+                    <div class="timeline-controls-row">
+                        <div class="timeline-playback-buttons">
+                            <button id="btn-timeline-restart" class="btn-timeline-ctrl" title="Volver al inicio">⏮</button>
+                            <button id="btn-timeline-step-back" class="btn-timeline-ctrl" title="Retroceder 1 segundo">⏪ -1s</button>
+                            <button id="btn-timeline-play" class="btn-timeline-ctrl btn-timeline-play" title="Reproducir / Pausar">
+                                <span id="timeline-play-icon">▶</span>
+                            </button>
+                            <button id="btn-timeline-step-fwd" class="btn-timeline-ctrl" title="Avanzar 1 segundo">+1s ⏩</button>
+                        </div>
+
+                        <div class="timeline-layers-group">
+                            <span class="timeline-mode-label">Capas:</span>
+                            <button type="button" id="toggle-layer-heatmap" class="btn-layer-pill active" title="Mapa de Calor">🔥 Mapa de Calor</button>
+                            <button type="button" id="toggle-layer-trajectories" class="btn-layer-pill active" title="Recorridos de Personas">↗️ Recorridos</button>
+                            <button type="button" id="btn-timeline-report" class="btn-layer-pill" title="Ver y descargar informe de la grabación" style="margin-left: 6px;">📊 Informe</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Floating Exit Fullscreen Button -->
+                <button id="btn-exit-fullscreen" class="btn-exit-fullscreen hidden" title="Salir de pantalla completa">
+                    <span>✕ Salir de Pantalla Completa</span>
+                </button>
+
+                <!-- Overlay: Frame info -->
+                <div id="frame-info" class="hidden">
+                    <span id="fps-display">-- FPS</span>
+                    <span id="resolution-display">--×--</span>
+                </div>
+            </div>
+
+            <!-- Session HUD & Timer Bar -->
+            <div id="timer-bar">
+                <div class="timer-display">
+                    <span class="timer-icon">⏱</span>
+                    <span id="timer-value">00:00:00</span>
+                    <span style="font-size: 0.72rem; color: #94a3b8; margin-left: 6px;">(Auto-stop a los 10 min)</span>
+                </div>
+                <div class="hud-session-info">
+                    <span class="hud-stat-pill">Cuerpos en escena: <strong id="stat-visible">0</strong></span>
+                    <span class="hud-stat-pill">Total detectados: <strong id="stat-total">0</strong></span>
+                    <div id="session-status-text">Listo para iniciar</div>
+                </div>
+            </div>
+
+            <!-- Controls Bar -->
+            <div id="controls-bar">
+                <div class="controls-group">
+                    <button id="btn-camera" class="btn btn-secondary" title="Encender / Apagar cámara">
+                        <span class="btn-icon">📷</span>
+                        <span class="btn-label">Cámara</span>
+                    </button>
+                    <button id="btn-camera-flip" class="btn btn-secondary" title="Cambiar de cámara">
+                        <span class="btn-icon">🔄</span>
+                        <span class="btn-label" id="camera-flip-label">Cambiar Cámara</span>
+                    </button>
+                    <button id="btn-start" class="btn btn-primary" disabled title="Iniciar registro de recorridos (10 minutos)">
+                        <span class="btn-icon">▶</span>
+                        <span class="btn-label">Iniciar Grabación</span>
+                    </button>
+                    <button id="btn-stop" class="btn btn-danger hidden" title="Finalizar grabación y ver mapa de calor">
+                        <span class="btn-icon">⏹</span>
+                        <span class="btn-label">Finalizar</span>
+                    </button>
+                    <button id="btn-fullscreen" class="btn btn-secondary" title="Pantalla completa">
+                        <span class="btn-icon">⛶</span>
+                        <span class="btn-label">Pantalla Completa</span>
+                    </button>
+                </div>
+
+                <div class="controls-group controls-config">
+                    <label class="config-label">
+                        <span>Formato:</span>
+                        <select id="select-aspect" class="config-select">
+                            <option value="16-9" selected>16:9</option>
+                            <option value="4-3">4:3</option>
+                            <option value="auto">Auto</option>
+                        </select>
+                    </label>
+                    <label class="config-label">
+                        <span>FPS:</span>
+                        <select id="select-fps" class="config-select">
+                            <option value="5" selected>5 FPS</option>
+                            <option value="8">8 FPS</option>
+                            <option value="10">10 FPS</option>
+                        </select>
+                    </label>
+                    <label class="config-label">
+                        <span>Calidad:</span>
+                        <select id="select-quality" class="config-select">
+                            <option value="0.4">Baja</option>
+                            <option value="0.6" selected>Media</option>
+                            <option value="0.8">Alta</option>
+                        </select>
+                    </label>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- SESSIONS HISTORY MODAL                                  -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div id="modal-history" class="modal-overlay">
+        <div class="modal-box modal-box-lg">
+            <div class="modal-header">
+                <h3><span>📂</span> Grabaciones de Recorridos y Mapas de Calor</h3>
+                <button id="btn-close-history" class="btn-close-modal">✕</button>
+            </div>
+            <div id="history-sessions-container" class="modal-body">
+                <div class="persons-empty">Cargando grabaciones...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- EXECUTIVE REPORT & DOWNLOAD MODAL                       -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div id="modal-export" class="modal-overlay">
+        <div class="modal-box modal-box-lg" style="max-width: 960px; height: 90vh;">
+            <div class="modal-header">
+                <h3><span>📊</span> Informe de Observación y Cartografía de Recorridos</h3>
+                <button id="btn-close-export" class="btn-close-modal">✕</button>
+            </div>
+            <div class="modal-body" style="padding: 12px 16px; display: flex; flex-direction: column; flex: 1; min-height: 0;">
+                <div class="export-preview-card" style="display: flex; flex-direction: column; flex: 1; min-height: 0;">
+                    <!-- Action Toolbar -->
+                    <div class="export-preview-toolbar">
+                        <div class="export-preview-toolbar-left">
+                            <span id="report-session-name" style="color: #64d2ff; font-weight: 600;">Jardín Gandhi</span>
+                            <span style="color: var(--text-tertiary); font-size: 0.72rem; margin-left: 6px;" id="report-session-id"></span>
+                        </div>
+                        <div class="export-download-buttons">
+                            <a id="btn-download-excel" href="#" download class="btn btn-sm btn-primary" title="Descargar informe en Microsoft Excel (.xlsx)">
+                                <span>📥</span> Descargar Excel (.xlsx)
+                            </a>
+                            <a id="btn-download-csv" href="#" download class="btn btn-sm btn-secondary" title="Descargar informe en formato CSV">
+                                <span>📄</span> Descargar CSV
+                            </a>
+                            <button id="btn-print-report" type="button" class="btn btn-sm btn-secondary" title="Imprimir o Guardar como PDF">
+                                <span>🖨️</span> Guardar PDF / Imprimir
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Printable Document Viewport -->
+                    <div class="export-preview-viewport" id="report-preview-container">
+                        <div class="executive-report-document" id="printable-report-doc">
+                            <div class="persons-empty">Generando informe...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- JAVASCRIPT MODULES                                      -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <script src="js/camera.js?v=5.0"></script>
+    <script src="js/websocket.js?v=5.0"></script>
+    <script src="js/heatmap-renderer.js?v=5.0"></script>
+    <script src="js/timeline.js?v=5.0"></script>
+    <script src="js/canvas-overlay.js?v=5.0"></script>
+    <script src="js/app.js?v=5.0"></script>
+</body>
+</html>

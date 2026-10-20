@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+    </pattern>
+    <linearGradient id="grassGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1b4332" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#081c15" stop-opacity="0.55"/>
+    </linearGradient>
+    <linearGradient id="paveGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#212529" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#16181a" stop-opacity="0.6"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Base Canvas -->
+  <rect width="1280" height="720" fill="#0d1117" />
+  <rect width="1280" height="720" fill="url(#grid)" />
+
+  <!-- Outer Architectural Boundaries (Utadeo Edificios) -->
+  <rect x="40" y="40" width="1200" height="640" fill="none" stroke="rgba(100,210,255,0.25)" stroke-width="2" stroke-dasharray="8,6" />
+  <text x="60" y="70" fill="rgba(100,210,255,0.6)" font-family="monospace" font-size="14" letter-spacing="2">ESQUEMA ARQUITECTÓNICO — JARDÍN GANDHI (UTADEO)</text>
+
+  <!-- Edificio Norte (Aulas) -->
+  <rect x="200" y="50" width="880" height="70" rx="4" fill="#1f242c" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" />
+  <text x="560" y="92" fill="#94a3b8" font-family="sans-serif" font-size="14" font-weight="600">EDIFICIO NORTE (ACCESO PRINCIPAL)</text>
+
+  <!-- Edificio Sur / Biblioteca -->
+  <rect x="200" y="600" width="880" height="70" rx="4" fill="#1f242c" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" />
+  <text x="570" y="642" fill="#94a3b8" font-family="sans-serif" font-size="14" font-weight="600">EDIFICIO SUR / CONECTOR</text>
+
+  <!-- Corredor de Tránsito Principal Peatonal (Eje Central) -->
+  <rect x="580" y="120" width="120" height="480" fill="url(#paveGrad)" stroke="#ff9f0a" stroke-width="1" stroke-dasharray="4,4" />
+  <text x="640" y="360" fill="#ff9f0a" font-family="sans-serif" font-size="11" font-weight="600" text-anchor="middle" transform="rotate(-90 640 360)">CORREDOR DE PASO PEATONAL</text>
+
+  <!-- Zona Verde Oeste (Jardín con Sombra) -->
+  <rect x="180" y="160" width="360" height="400" rx="16" fill="url(#grassGrad)" stroke="#30d158" stroke-width="2" />
+  <text x="360" y="195" fill="#30d158" font-family="sans-serif" font-size="13" font-weight="700" text-anchor="middle">ZONA VERDE OCCIDENTAL (SOMBRA ARBÓREA)</text>
+
+  <!-- Árboles en Zona Verde Oeste -->
+  <circle cx="280" cy="270" r="45" fill="rgba(48,209,88,0.2)" stroke="#30d158" stroke-width="1.5" />
+  <circle cx="280" cy="270" r="6" fill="#30d158" />
+  <text x="280" y="330" fill="#a7f3d0" font-family="sans-serif" font-size="10" text-anchor="middle">Árbol 01 (Sombra)</text>
+
+  <circle cx="420" cy="380" r="55" fill="rgba(48,209,88,0.2)" stroke="#30d158" stroke-width="1.5" />
+  <circle cx="420" cy="380" r="6" fill="#30d158" />
+  <text x="420" y="450" fill="#a7f3d0" font-family="sans-serif" font-size="10" text-anchor="middle">Árbol 02 (Sombra)</text>
+
+  <!-- Bancas / Muretes Oeste -->
+  <rect x="230" y="480" width="120" height="24" rx="4" fill="#0a84ff" fill-opacity="0.4" stroke="#0a84ff" stroke-width="2" />
+  <text x="290" y="496" fill="#bfdbfe" font-family="sans-serif" font-size="10" font-weight="600" text-anchor="middle">Bancas Oeste</text>
+
+  <rect x="380" y="480" width="120" height="24" rx="4" fill="#0a84ff" fill-opacity="0.4" stroke="#0a84ff" stroke-width="2" />
+  <text x="440" y="496" fill="#bfdbfe" font-family="sans-serif" font-size="10" font-weight="600" text-anchor="middle">Murete Sentable</text>
+
+  <!-- Zona Oriental (Plazoleta / Área Abierta) -->
+  <rect x="740" y="160" width="380" height="400" rx="8" fill="url(#paveGrad)" stroke="#bf5af2" stroke-width="2" />
+  <text x="930" y="195" fill="#bf5af2" font-family="sans-serif" font-size="13" font-weight="700" text-anchor="middle">PLAZOLETA ORIENTAL (EXPOSICIÓN SOLAR)</text>
+
+  <!-- Bancas Perimetrales Este -->
+  <rect x="780" y="240" width="30" height="110" rx="4" fill="#0a84ff" fill-opacity="0.4" stroke="#0a84ff" stroke-width="2" />
+  <text x="795" y="300" fill="#bfdbfe" font-family="sans-serif" font-size="10" font-weight="600" text-anchor="middle" transform="rotate(-90 795 300)">Banca E1</text>
+
+  <rect x="780" y="400" width="30" height="110" rx="4" fill="#0a84ff" fill-opacity="0.4" stroke="#0a84ff" stroke-width="2" />
+  <text x="795" y="460" fill="#bfdbfe" font-family="sans-serif" font-size="10" font-weight="600" text-anchor="middle" transform="rotate(-90 795 460)">Banca E2</text>
+
+  <!-- Centro de Plazoleta -->
+  <circle cx="950" cy="360" r="70" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" stroke-dasharray="6,4" />
+  <text x="950" y="365" fill="#64748b" font-family="sans-serif" font-size="11" text-anchor="middle">ÁREA ABIERTA CENTRAL</text>
+
+  <!-- Leyenda Técnica -->
+  <g transform="translate(60, 610)">
+    <rect x="0" y="0" width="14" height="14" rx="2" fill="#30d158" />
+    <text x="22" y="11" fill="#cbd5e1" font-family="sans-serif" font-size="11">Zona Verde / Sombra</text>
+
+    <rect x="180" y="0" width="14" height="14" rx="2" fill="#0a84ff" />
+    <text x="202" y="11" fill="#cbd5e1" font-family="sans-serif" font-size="11">Mobiliario / Bancas</text>
+
+    <rect x="360" y="0" width="14" height="14" rx="2" fill="#ff9f0a" />
+    <text x="382" y="11" fill="#cbd5e1" font-family="sans-serif" font-size="11">Corredor de Flujo</text>
+  </g>
+</svg>
